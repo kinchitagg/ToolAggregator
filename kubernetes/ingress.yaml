@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: toolsearch-ingress
+  namespace: default
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing  # Makes ALB public
+    alb.ingress.kubernetes.io/load-balancer-type: "alb"  # Use ALB (not NLB)
+    alb.ingress.kubernetes.io/target-type: "ip"  # Targets pods directly
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'  # Listens on port 80
+    alb.ingress.kubernetes.io/subnets: subnet-026406a489cfc7a21, subnet-001a12361f2667675
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: "/*"  # ✅ Accepts all traffic at ALB DNS
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: toolsearchapp  # ✅ Forward traffic to this service
+                port:
+                  number: 80
